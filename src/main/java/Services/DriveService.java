@@ -1,6 +1,7 @@
 package Services;
 
 import Models.FileMetadata;
+import Models.Permission;
 
 public class DriveService {
 
@@ -11,8 +12,7 @@ public class DriveService {
     public static void download(String fileId, String path){
         // TODO download the file and save it in path
     }
-    public static String generateAccessToken(Object user){
-        //TODO Unknown
+    public static Permission[] getPermissionsOnFile(String fileId){
         return null;
     }
 }

@@ -1,5 +1,11 @@
 package Models;
 
 public class FileMetadata {
-    // title, owner, permissions, ...
+    private String fileId;
+    private String fileName;
+    private String type;
+    private long size;
+    private User owner;
+    private long createdAt;
+    private long updatedAt;
 }
