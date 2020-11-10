@@ -1,7 +1,9 @@
 package Enums;
 
 public enum MessageEvent {
-    CONTENT_CHANGE, // File was uploaded or updated
+    CREATE, // File was uploaded
+    PERMISSION_CHANGE, // Permissions were changed
+    CONTENT_CHANGE, // File was updated
     DELETE, // File was deleted
-    METADATA_CHANGE, // Change in Permissions, title, etc
+    METADATA_CHANGE, // Change in title, etc
 }

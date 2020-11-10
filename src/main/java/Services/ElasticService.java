@@ -1,5 +1,6 @@
 package Services;
 
+import Models.Document;
 import Models.FileMetadata;
 import Models.Permission;
 public class ElasticService {
@@ -12,14 +13,12 @@ public class ElasticService {
         // TODO update the metadata in all documents of fileId in Elastic
     }
 
-    public static void indexChunk(String fileId, String chunkContent, String index){
-        // TODO update the permissions in all documents of fileId in Elastic
-    }
-
     public static void indexPermissions(String fileId, Permission[] permissions, String index){
         // TODO update the permissions in all documents of fileId in Elastic
     }
 
+    public static void indexDocument(Document docuemnt, String index){
 
+    }
 
 }

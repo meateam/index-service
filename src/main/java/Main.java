@@ -5,13 +5,11 @@ import Services.*;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.sax.BodyContentHandler;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
 public class Main {
-
 
     public static String parseExample() throws Exception{
         AutoDetectParser parser = new AutoDetectParser();
@@ -28,41 +26,29 @@ public class Main {
         }
     }
 
-    public static void processMessage(KafkaMessage message){
-
-        MessageEvent messageEvent = message.getMessageEvent();
-        String fileId = message.getFileId();
-        // TODO get the metadata of the file from Drive
-        FileMetadata fileMetadata = null;
-        // TODO get the ES index
-        String index = null, content = null, downloadPath = null;
-        String [] slots = null;
-
-        switch (messageEvent) {
-            case CONTENT_CHANGE:
-//                System.out.println("Content change");
-//                downloadPath = null; //TODO fileId.type
-//                //TODO download the file
-//                DriveService.download(fileId , downloadPath);
-//                //TODO parse the file and get the content
-//                content = ParsingService.getContent(downloadPath);
-//                //TODO delete the file
-//                FileService.deleteFile(downloadPath);
-//                //TODO get the slots
-//                slots = ChunkService.getSlots(content);
-//                //TODO index all the slots in elastic
-//                ElasticService.processContentChange(fileId,slots,fileMetadata,index);
-                break;
-            case METADATA_CHANGE:
-//                System.out.println("Metadata change");
-//                //TODO change the permissions in all corresponding elastic documents
-//                ElasticService.processMetadataChange(fileId , fileMetadata,index);
-//                break;
-            case DELETE:
-//                System.out.println("Delete event");
-//                //TODO delete all documents of fileId from elastic
-//                ElasticService.delete(fileId, index);
-//                break;
+    public static void processMessage(KafkaMessage message) throws Exception {
+        try {
+            MessageEvent messageEvent = message.getMessageEvent();
+            String fileId = message.getFileId();
+            String ownerId = message.getOwnerId();
+            switch (messageEvent) {
+                case CREATE:
+                    EventService.processCreate(fileId,ownerId);
+                case PERMISSION_CHANGE:
+                    EventService.processPermissionChange(fileId,ownerId);
+                case CONTENT_CHANGE:
+                    EventService.processContentChange(fileId,ownerId);
+                    break;
+                case METADATA_CHANGE:
+                    EventService.processMetadataChange(fileId,ownerId);
+                    break;
+                case DELETE:
+                    EventService.processDelete(fileId,ownerId);
+                    break;
+            }
+        }
+        catch(Exception exception){
+            throw exception;
         }
     }
 

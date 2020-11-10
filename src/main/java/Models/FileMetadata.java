@@ -8,4 +8,8 @@ public class FileMetadata {
     private User owner;
     private long createdAt;
     private long updatedAt;
+
+    public User getOwner(){
+        return this.owner;
+    }
 }

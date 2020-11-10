@@ -12,7 +12,7 @@ public class DriveService {
     public static void download(String fileId, String path){
         // TODO download the file and save it in path
     }
-    public static Permission[] getPermissionsOnFile(String fileId){
+    public static Permission[] getPermissions(String fileId){
         return null;
     }
 }
