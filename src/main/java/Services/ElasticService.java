@@ -17,7 +17,7 @@ public class ElasticService {
         // TODO update the permissions in all documents of fileId in Elastic
     }
 
-    public static void indexDocument(Document docuemnt, String index){
+    public static void indexDocument(Document document, String index){
 
     }
 
