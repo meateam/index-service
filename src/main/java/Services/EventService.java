@@ -1,9 +1,7 @@
 package Services;
 
 import Config.Config;
-import Models.Document;
-import Models.FileMetadata;
-import Models.Permission;
+import Models.*;
 import ucar.nc2.iosp.Layout;
 
 import java.io.File;
@@ -60,12 +58,16 @@ public class EventService {
             content = ParsingService.cleanContent(content);
             chunks = ChunkService.getChunks(content);
             preSuffArrays = ChunkService.getPreSuffArrays(content);
-            System.out.println("hi");
 //            for (String chunkContent : chunks) {
-//                Document document = new Document(fileId, chunkContent, metadata, permissions);
+//                Document document = new ChunkDocument(fileId, metadata, permissions, chunkContent);
 //                ElasticService.indexDocument(document, ownerId);
 //            }
-//            FileService.deleteFile(localFilePath);
+//
+//            for (String[] prefSuffParts : preSuffArrays){
+//                Document document = new PrefSuffDocument(fileId, metadata, permissions, prefSuffParts);
+//                ElasticService.indexDocument(document, ownerId);
+//            }
+            FileService.deleteFile(localFilePath);
         }
         catch(Exception exception){
             throw exception;
