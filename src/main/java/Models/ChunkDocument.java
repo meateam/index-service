@@ -1,5 +1,7 @@
 package Models;
 
+import java.util.HashMap;
+
 public class ChunkDocument extends Document{
     private String chunkContent;
 
@@ -8,4 +10,10 @@ public class ChunkDocument extends Document{
         this.chunkContent = chunkContent;
     }
 
+    @Override
+    public HashMap<String, Object> getHashMap() {
+        HashMap<String,Object> map = super.getHashMap();
+        map.put("chunkContent",chunkContent);
+        return map;
+    }
 }
