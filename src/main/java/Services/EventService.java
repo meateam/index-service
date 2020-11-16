@@ -5,11 +5,12 @@ import Models.*;
 import ucar.nc2.iosp.Layout;
 
 import java.io.File;
+import java.io.IOException;
 
 
 public class EventService {
 
-    public static void processDelete(String fileId, String ownerId) {
+    public static void processDelete(String fileId, String ownerId) throws IOException {
         try{
             ElasticService.delete(fileId,ownerId);
         }
@@ -18,7 +19,7 @@ public class EventService {
         }
     }
 
-    public static void processMetadataChange(String fileId , String ownerId){
+    public static void processMetadataChange(String fileId , String ownerId) throws IOException {
         try{
             FileMetadata meatadata = DriveService.getMetadata(fileId);
             ElasticService.indexMetadata(fileId,meatadata,ownerId);

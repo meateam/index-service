@@ -1,9 +1,15 @@
 package Models;
 
 
+import Services.ElasticService;
+import com.github.javafaker.Faker;
+import com.github.javafaker.File;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class Document {
     private String fileId;
@@ -14,6 +20,12 @@ public class Document {
         this.fileId = fileId;
         this.metadata = metadata;
         this.permissions = permissions;
+    }
+
+    public Document(Document document){
+        this.fileId = document.fileId;
+        this.metadata = document.metadata;
+        this.permissions = document.permissions;
     }
 
     public HashMap<String,Object> getHashMap(){
@@ -27,5 +39,33 @@ public class Document {
         }
         map.put("permissions",permissionList.toArray());
         return map;
+    }
+
+    public static Document getRandom(FileMetadata metadata){
+        Random rand = new Random();
+        Permission [] permissions = new Permission[rand.nextInt(5)+1];
+        for (int i = 0 ; i < permissions.length ; i++)
+        {
+            permissions[i] = Permission.getRandom();
+        }
+        return new Document(metadata.getFileId(), metadata, permissions);
+    }
+
+    public static void indexRandomDocuments(int fileIdCount, int chunksCountPerFileId) throws Exception {
+        try {
+            Faker faker = new Faker();
+            for (int i = 0; i < fileIdCount; i++) {
+                User owner = User.getRandom();
+                String fileId = faker.idNumber().valid();
+                FileMetadata metadata = FileMetadata.getRandom(fileId,owner);
+                for (int j = 0; j < chunksCountPerFileId; j++) {
+                    Document document = ChunkDocument.getRandom(metadata);
+                    ElasticService.indexDocument(document, "test");
+                }
+            }
+        }
+        catch(Exception e){
+            throw e;
+        }
     }
 }

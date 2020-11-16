@@ -1,6 +1,10 @@
 package Models;
 
+import com.github.javafaker.Faker;
+import com.github.javafaker.File;
+
 import java.util.HashMap;
+import java.util.Random;
 
 public class FileMetadata {
     private String fileId;
@@ -86,5 +90,17 @@ public class FileMetadata {
         map.put("createdAt",createdAt);
         map.put("updatedAt",updatedAt);
         return map;
+    }
+
+    public static FileMetadata getRandom(String fileId , User owner){
+        Faker faker = new Faker();
+        String [] types = {"docx", "pptx", "pdf", "xlsx"};
+        String type = types[faker.random().nextInt(types.length)];
+        String fileName = faker.animal().name()+"."+type;
+        long size = faker.random().nextLong();
+        long createdAt = Math.abs(faker.random().nextLong());
+        long updatedAt = createdAt + faker.random().nextLong();
+        FileMetadata metadata = new FileMetadata(fileId,fileName, type, size, owner, createdAt, updatedAt );
+        return metadata;
     }
 }

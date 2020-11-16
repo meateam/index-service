@@ -4,6 +4,8 @@ import Services.*;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.sax.BodyContentHandler;
+//import org.graalvm.compiler.lir.LIRInstruction;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -60,21 +62,13 @@ public class Main {
 
     public static void main(String[]args){
         try{
-            Permission[] permissions = new Permission[1];
-            permissions[0] = new Permission(new User("11111","Lihi Mashiach"), "write");
-            Document document = new ChunkDocument("123456789",
-                    new FileMetadata("123456789",
-                            "hello.docx",
-                            "docx",
-                            1000,
-                            new User("11111","Lihi Mashiach"),
-                            1111,
-                            1111
-                    ),
-                    permissions,
-                    "bla bla bla bla bla bla");
-            ElasticService.indexDocument(document, "11111");
-            System.out.println("hi");
+
+           // Document.indexRandomDocuments(3,3);
+
+//            ElasticService.delete("895-64-0360","test");
+            //ElasticService.indexMetadata("056-34-7491", FileMetadata.getRandom("056-34-7491", User.getRandom()), "test");
+           // System.out.println("hi");
+
 //            KafkaMessage message = new KafkaMessage(MessageEvent.CREATE, "876", "146");
 //            processMessage(message);
 //            String str = parseExample();

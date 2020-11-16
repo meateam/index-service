@@ -10,8 +10,16 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.reindex.BulkByScrollResponse;
+import org.elasticsearch.index.reindex.DeleteByQueryRequest;
+import org.elasticsearch.index.reindex.UpdateByQueryRequest;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.script.ScriptType;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class ElasticService {
@@ -19,14 +27,42 @@ public class ElasticService {
     static{
         client = new RestHighLevelClient(
                 RestClient.builder(new HttpHost("localhost", 9200, "http")));
+
     }
 
-    public static void delete(String fileId, String index){
+    public static void delete(String fileId, String index) throws IOException {
         //TODO remove all documents with fileId from index
+        try {
+            DeleteByQueryRequest request =
+                    new DeleteByQueryRequest(index);
+            request.setQuery(new MatchQueryBuilder("fileId", fileId));
+            BulkByScrollResponse bulkResponse =
+                    client.deleteByQuery(request, RequestOptions.DEFAULT);
+            long deletedDocs = bulkResponse.getDeleted();
+
+            System.out.println(deletedDocs);
+        }
+        catch(Exception e){
+            throw e;
+        }
+
     }
 
-    public static void indexMetadata(String fileId, FileMetadata fileMetadata, String index){
-        // TODO update the metadata in all documents of fileId in Elastic
+    public static void indexMetadata(String fileId, FileMetadata fileMetadata, String index) throws IOException {
+        UpdateByQueryRequest request =
+                new UpdateByQueryRequest(index);
+        request.setQuery(new MatchQueryBuilder("fileId", fileId));
+        HashMap<String, Object > params = new HashMap<String, Object>();
+        params.put("metadata", fileMetadata.getHashMap());
+        request.setScript(
+                new Script(
+                    ScriptType.INLINE, "painless",
+                    "ctx._source.metadata = params.metadata",
+                    params
+                )
+        );
+        BulkByScrollResponse bulkResponse =
+                client.updateByQuery(request, RequestOptions.DEFAULT);
     }
 
     public static void indexPermissions(String fileId, Permission[] permissions, String index){
@@ -43,8 +79,6 @@ public class ElasticService {
         catch(Exception e){
             throw e;
         }
-
-
     }
 
 }
