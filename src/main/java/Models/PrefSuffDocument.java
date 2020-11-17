@@ -26,10 +26,10 @@ public class PrefSuffDocument extends Document {
         return map;
     }
 
-    public static PrefSuffDocument getRandom(FileMetadata metadata){
+    public static PrefSuffDocument getRandom(FileMetadata metadata, Permission [] permissions){
         Random rand = new Random();
         Faker faker = new Faker();
-        PrefSuffDocument document = new PrefSuffDocument(Document.getRandom(metadata));
+        PrefSuffDocument document = new PrefSuffDocument(Document.getRandom(metadata, permissions));
         String [] prefSuff = new String[rand.nextInt(Config.PRE_SUFF_PARTS_COUNT)+1];
         for (int i=0; i<prefSuff.length; i++) {
             prefSuff[i]= faker.shakespeare().hamletQuote();

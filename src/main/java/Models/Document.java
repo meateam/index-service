@@ -41,9 +41,7 @@ public class Document {
         return map;
     }
 
-    public static Document getRandom(FileMetadata metadata){
-        Random rand = new Random();
-        Permission [] permissions = Permission.getRandomArray();
+    public static Document getRandom(FileMetadata metadata, Permission [] permissions){
         return new Document(metadata.getFileId(), metadata, permissions);
     }
 
@@ -54,8 +52,9 @@ public class Document {
                 User owner = User.getRandom();
                 String fileId = faker.idNumber().valid();
                 FileMetadata metadata = FileMetadata.getRandom(fileId,owner);
+                Permission [] permissions = Permission.getRandomArray();
                 for (int j = 0; j < chunksCountPerFileId; j++) {
-                    Document document = ChunkDocument.getRandom(metadata);
+                    Document document = ChunkDocument.getRandom(metadata, permissions);
                     ElasticService.indexDocument(document, "test");
                 }
             }

@@ -26,9 +26,9 @@ public class ChunkDocument extends Document{
         return map;
     }
 
-    public static ChunkDocument getRandom(FileMetadata metadata){
+    public static ChunkDocument getRandom(FileMetadata metadata, Permission [] permissions){
         Faker faker = new Faker();
-        ChunkDocument document = new ChunkDocument (Document.getRandom(metadata));
+        ChunkDocument document = new ChunkDocument (Document.getRandom(metadata, permissions));
         document.chunkContent = faker.rickAndMorty().quote();
         return document;
     }
