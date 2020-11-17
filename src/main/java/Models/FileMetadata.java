@@ -14,8 +14,9 @@ public class FileMetadata {
     private User owner;
     private long createdAt;
     private long updatedAt;
+    private String[] ancestors;
 
-    public FileMetadata(String fileId, String fileName, String type, long size, User owner, long createdAt, long updatedAt){
+    public FileMetadata(String fileId, String fileName, String type, long size, User owner, long createdAt, long updatedAt, String[] ancestors){
         this.fileId = fileId;
         this.fileName = fileName;
         this.type = type;
@@ -23,6 +24,7 @@ public class FileMetadata {
         this.owner = owner;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.ancestors = ancestors;
     }
 
     public String getFileId() {
@@ -47,6 +49,14 @@ public class FileMetadata {
 
     public String getType() {
         return type;
+    }
+
+    public String[] getAncestors() {
+        return ancestors;
+    }
+
+    public void setAncestors(String[] ancestors) {
+        this.ancestors = ancestors;
     }
 
     public void setCreatedAt(long createdAt) {
@@ -89,10 +99,20 @@ public class FileMetadata {
         map.put("owner",owner.getHashMap());
         map.put("createdAt",createdAt);
         map.put("updatedAt",updatedAt);
+        map.put("ancestors",ancestors);
         return map;
     }
 
-    public static FileMetadata getRandom(String fileId , User owner){
+    public static String[] getRandomAncestors(){
+        Faker faker = new Faker();
+        String[] ancestors = new String[faker.random().nextInt(5)+1];
+        for(int i = 0 ; i < ancestors.length ; i ++){
+            ancestors[i] = faker.color().name();
+        }
+        return ancestors;
+    }
+
+    public static FileMetadata getRandom(String fileId , User owner , String[] ancestors){
         Faker faker = new Faker();
         String [] types = {"docx", "pptx", "pdf", "xlsx"};
         String type = types[faker.random().nextInt(types.length)];
@@ -100,7 +120,7 @@ public class FileMetadata {
         long size = faker.random().nextLong();
         long createdAt = Math.abs(faker.random().nextLong());
         long updatedAt = createdAt + faker.random().nextLong();
-        FileMetadata metadata = new FileMetadata(fileId,fileName, type, size, owner, createdAt, updatedAt );
+        FileMetadata metadata = new FileMetadata(fileId,fileName, type, size, owner, createdAt, updatedAt,ancestors);
         return metadata;
     }
 }
