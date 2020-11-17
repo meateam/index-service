@@ -9,6 +9,7 @@ import org.apache.tika.sax.BodyContentHandler;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Random;
 
 public class Main {
 

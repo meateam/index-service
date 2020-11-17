@@ -76,7 +76,7 @@ public class EventService {
     }
 
 
-    public static void processPermissionChange(String fileId,String ownerId){
+    public static void processPermissionChange(String fileId,String ownerId) throws IOException {
         try{
             Permission[] permissions = DriveService.getPermissions(fileId);
             ElasticService.indexPermissions(fileId,permissions,ownerId);

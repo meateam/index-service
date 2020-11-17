@@ -19,6 +19,7 @@ import org.elasticsearch.script.Script;
 import org.elasticsearch.script.ScriptType;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -65,8 +66,31 @@ public class ElasticService {
                 client.updateByQuery(request, RequestOptions.DEFAULT);
     }
 
-    public static void indexPermissions(String fileId, Permission[] permissions, String index){
-        // TODO update the permissions in all documents of fileId in Elastic
+    public static void indexPermissions(String fileId, Permission[] permissions, String index) throws IOException {
+        for (Permission element: permissions) {
+            System.out.println(element.toString());
+        }
+        UpdateByQueryRequest request =
+                new UpdateByQueryRequest(index);
+        request.setQuery(new MatchQueryBuilder("fileId", fileId));
+        HashMap<String, Object > params = new HashMap<String, Object>();
+
+        ArrayList<HashMap<String,Object>> permissionList = new ArrayList<HashMap<String,Object>>();
+        for (Permission permission: permissions) {
+            permissionList.add(permission.getHashMap());
+        }
+        params.put("permissions",permissionList.toArray());
+
+        request.setScript(
+                new Script(
+                        ScriptType.INLINE, "painless",
+                        "ctx._source.permissions = params.permissions",
+                        params
+                )
+        );
+        BulkByScrollResponse bulkResponse =
+                client.updateByQuery(request, RequestOptions.DEFAULT);
+        System.out.println(bulkResponse.getUpdated());
     }
 
     public static void indexDocument(Document document, String index) throws IOException {
@@ -80,5 +104,6 @@ public class ElasticService {
             throw e;
         }
     }
+    
 
 }

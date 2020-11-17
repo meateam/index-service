@@ -43,11 +43,7 @@ public class Document {
 
     public static Document getRandom(FileMetadata metadata){
         Random rand = new Random();
-        Permission [] permissions = new Permission[rand.nextInt(5)+1];
-        for (int i = 0 ; i < permissions.length ; i++)
-        {
-            permissions[i] = Permission.getRandom();
-        }
+        Permission [] permissions = Permission.getRandomArray();
         return new Document(metadata.getFileId(), metadata, permissions);
     }
 
