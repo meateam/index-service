@@ -19,15 +19,15 @@ public class EventService {
         }
     }
 
-    public static void processMetadataChange(String fileId , String ownerId) throws IOException {
-        try{
-            FileMetadata meatadata = DriveService.getMetadata(fileId);
-            ElasticService.indexMetadata(fileId,meatadata,ownerId);
-        }
-        catch(Exception exception){
-            throw exception;
-        }
-    }
+//    public static void processMetadataChange(String fileId , String ownerId) throws IOException {
+//        try{
+////            FileMetadata meatadata = DriveService.getMetadata(fileId);
+//            ElasticService.indexMetadata(fileId,meatadata,ownerId);
+//        }
+//        catch(Exception exception){
+//            throw exception;
+//        }
+//    }
 
     public static void processContentChange(String fileId,String ownerId) throws Exception {
         try{

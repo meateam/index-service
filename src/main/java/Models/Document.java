@@ -51,7 +51,7 @@ public class Document {
             for (int i = 0; i < fileIdCount; i++) {
                 User owner = User.getRandom();
                 String fileId = faker.idNumber().valid();
-                String[] ancestors = FileMetadata.getRandomAncestors();
+                Folder[] ancestors = FileMetadata.getRandomAncestors();
                 FileMetadata metadata = FileMetadata.getRandom(fileId,owner,ancestors);
                 Permission [] permissions = Permission.getRandomArray();
                 for (int j = 0; j < chunksCountPerFileId; j++) {

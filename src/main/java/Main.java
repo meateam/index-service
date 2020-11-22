@@ -64,6 +64,10 @@ public class Main {
     public static void main(String[]args){
         try{
 
+//            DriveService.getAncestors("5fba241eac105400135301ad");
+            FileMetadata metadata = FileMetadata.getMetadata("5fba241eac105400135301ad");
+            System.out.println("hi");
+//            DriveService.getMetadata("5fb3cda3a865ab0012099d32");
            // Document.indexRandomDocuments(3,3);
 
 //            ElasticService.delete("895-64-0360","test");

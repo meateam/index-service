@@ -1,8 +1,14 @@
 package Models;
 
+import DriveStubs.grpc.FileOuterClass;
+import Services.DriveService;
 import com.github.javafaker.Faker;
 import com.github.javafaker.File;
+import com.google.protobuf.ProtocolStringList;
+import opennlp.tools.util.StringList;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -14,9 +20,9 @@ public class FileMetadata {
     private User owner;
     private long createdAt;
     private long updatedAt;
-    private String[] ancestors;
+    private Folder[] ancestors;
 
-    public FileMetadata(String fileId, String fileName, String type, long size, User owner, long createdAt, long updatedAt, String[] ancestors){
+    public FileMetadata(String fileId, String fileName, String type, long size, User owner, long createdAt, long updatedAt, Folder[] ancestors){
         this.fileId = fileId;
         this.fileName = fileName;
         this.type = type;
@@ -51,11 +57,11 @@ public class FileMetadata {
         return type;
     }
 
-    public String[] getAncestors() {
+    public Folder[] getAncestors() {
         return ancestors;
     }
 
-    public void setAncestors(String[] ancestors) {
+    public void setAncestors(Folder[] ancestors) {
         this.ancestors = ancestors;
     }
 
@@ -103,16 +109,16 @@ public class FileMetadata {
         return map;
     }
 
-    public static String[] getRandomAncestors(){
+    public static Folder[] getRandomAncestors(){
         Faker faker = new Faker();
-        String[] ancestors = new String[faker.random().nextInt(5)+1];
+        Folder[] ancestors = new Folder[faker.random().nextInt(5)+1];
         for(int i = 0 ; i < ancestors.length ; i ++){
-            ancestors[i] = faker.color().name();
+            Folder folder = Folder.getRandom();
         }
         return ancestors;
     }
 
-    public static FileMetadata getRandom(String fileId , User owner , String[] ancestors){
+    public static FileMetadata getRandom(String fileId , User owner , Folder[] ancestors){
         Faker faker = new Faker();
         String [] types = {"docx", "pptx", "pdf", "xlsx"};
         String type = types[faker.random().nextInt(types.length)];
@@ -123,4 +129,30 @@ public class FileMetadata {
         FileMetadata metadata = new FileMetadata(fileId,fileName, type, size, owner, createdAt, updatedAt,ancestors);
         return metadata;
     }
+
+    public static FileMetadata getMetadata (String fileId) {
+        FileOuterClass.File file = DriveService.getFileById(fileId);
+        String fileName = file.getName();
+        String type = file.getType();
+        long size = file.getSize();
+        User owner = User.getUser(file.getOwnerID());
+        long createdAt = file.getCreatedAt();
+        long updatedAt = file.getUpdatedAt();
+        ProtocolStringList ancestors = DriveService.getAncestors(fileId).getAncestorsList();
+        ArrayList <Folder> ancestorsArray = new ArrayList<Folder>();
+        for (String ancestor : ancestors)
+        {
+            ancestorsArray.add(Folder.getFolder(ancestor));
+        }
+        Folder[] ancestorsFolderArray = Arrays.stream(ancestorsArray.toArray()).toArray(Folder[]::new);
+        FileMetadata metadata = new FileMetadata(fileId,fileName, type, size, owner, createdAt, updatedAt,ancestorsFolderArray);
+        return metadata;
+    }
+
+    public static String getFileNameById(String fileId){
+        FileOuterClass.File file = DriveService.getFileById(fileId);
+        return file.getName();
+    }
+
+
 }
