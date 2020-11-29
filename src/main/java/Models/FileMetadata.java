@@ -105,15 +105,17 @@ public class FileMetadata {
         map.put("owner",owner.getHashMap());
         map.put("createdAt",createdAt);
         map.put("updatedAt",updatedAt);
-        map.put("ancestors",ancestors);
+        map.put("ancestors",Folder.getHashMapArray(ancestors));
         return map;
     }
+
+
 
     public static Folder[] getRandomAncestors(){
         Faker faker = new Faker();
         Folder[] ancestors = new Folder[faker.random().nextInt(5)+1];
         for(int i = 0 ; i < ancestors.length ; i ++){
-            Folder folder = Folder.getRandom();
+            ancestors[i] = Folder.getRandom();
         }
         return ancestors;
     }

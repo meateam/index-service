@@ -64,9 +64,10 @@ public class Main {
     public static void main(String[]args){
         try{
 
+            Document.indexRandomDocuments(3,3);
 //            DriveService.getAncestors("5fba241eac105400135301ad");
 //            DriveService.getPermissions("5fba241eac105400135301ad");
-            Permission.getPermissionsArray("5fba241eac105400135301ad");
+//            Permission.getPermissionsArray("5fba241eac105400135301ad");
 //            DriveService.getMetadata("5fb3cda3a865ab0012099d32");
            // Document.indexRandomDocuments(3,3);
 

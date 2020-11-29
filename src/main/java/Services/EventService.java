@@ -52,7 +52,7 @@ public class EventService {
             metadata = FileMetadata.getMetadata(fileId);
             ownerId = metadata.getOwner().getUserId();
 
-            permissions = Permission.getPermissionsArray(fileId);
+            permissions = Permission.getPermissions(fileId);
 
             DriveService.download(fileId, localFilePath);
             content = ParsingService.getContent(localFilePath);
