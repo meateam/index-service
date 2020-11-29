@@ -1,10 +1,12 @@
-import Config.Config;
+package Services;
+
 import Enums.MessageEvent;
 import Models.RabbitMessage;
-
+import Config.Config;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -16,66 +18,98 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+
+import java.io.File;
+import java.io.IOException;
 
 @SpringBootApplication
-//@EnableScheduling
+@EnableScheduling
 public class Main {
 
-    private static final Logger log = LoggerFactory.getLogger(RabbitMessage.class);
+    private  static Logger log4jLoggeer ;
 
-    public static void main(String[]args){
+    public static void main(String[]args) throws IOException {
         SpringApplication.run(Main.class, args);
+        BasicConfigurator.configure();
+        PropertyConfigurator.configure("C:\\Users\\Liora Yacob\\index-service\\src\\main\\resources\\log4j.properties");
+        log4jLoggeer = Logger.getLogger(Main.class);
+    }
+
+    @Async
+    @Scheduled(fixedDelay = 60000)
+    public void deleteOldLogFiles() //limit log files per folder every 24 hours
+    {
+        File errorDir = new File("C:\\Users\\Liora Yacob\\index-service\\src\\main\\java\\logs\\error");
+        File infoDIr = new File("C:\\Users\\Liora Yacob\\index-service\\src\\main\\java\\logs\\info");
+        deleteOldestLogFile(errorDir);
+        deleteOldestLogFile(infoDIr);
+    }
+
+    public static void deleteOldestLogFile(File logDir){
+        File[] logFiles = logDir.listFiles();
+        long oldestDate = Long.MAX_VALUE;
+        File oldestFile = null;
+        int maxBackupLogFiles=1;
+
+        if( logFiles != null && logFiles.length >maxBackupLogFiles){
+            //delete oldest files after theres more than Max Backup Log files
+            for(File f: logFiles){
+                if(f.lastModified() < oldestDate){
+                    oldestDate = f.lastModified();
+                    oldestFile = f;
+                }
+            }
+            if(oldestFile != null){
+                boolean e=oldestFile.delete();
+            }
+        }
     }
 
     //Consumer
     @RabbitListener(queues = Config.QUEUE_NAME)
     public void receiveMessage(final RabbitMessage message) {
-        log.info("Received message , message is: {}", message.toString());
-        Main.processMessage(message);
+        try{
+            log4jLoggeer.info("Received message: "+ message.toString());
+            Main.processMessage(message);
+            //just an example for logging errors
+            if(message.event == MessageEvent.CREATE)
+                throw new Exception("Test Error Log");
+        }
+        catch (Exception e){
+            log4jLoggeer.error(e.toString());
+        }
     }
 
     public static void processMessage(RabbitMessage message){
-        log.info("processMessage");
-
         MessageEvent event = message.getEvent();
         String fileId=message.getFileId();
-
         switch (event) {
             case DELETE:
-                log.info("DELETE case");
-//				System.out.println("Delete event");
                 //TODO delete all documents of fileId from elastic
-//				ElasticService.delete(fileId, index);
+                //				ElasticService.delete(fileId, index);
                 break;
             case CREATE:
-                log.info("CREATE case");
+
                 break;
             case CONTENT_CHANGE:
-                log.info("CONTENT_CHANGE case");
-//				System.out.println("Content change");
-//				downloadPath = null; //TODO fileId.type
+                //				downloadPath = null; //TODO fileId.type
                 //TODO download the file
-//				DriveService.download(fileId , downloadPath);
+                //				DriveService.download(fileId , downloadPath);
                 //TODO parse the file and get the content
-//				content = ParsingService.getContent(downloadPath);
+                //				content = ParsingService.getContent(downloadPath);
                 //TODO delete the file
-//				FileService.deleteFile(downloadPath);
+                //				FileService.deleteFile(downloadPath);
                 //TODO get the slots
-//				slots = SlotService.getSlots(content);
+                //				slots = SlotService.getSlots(content);
                 //TODO index all the slots in elastic
-//				ElasticService.processContentChange(fileId,slots,fileMetadata,index);
-                break;
-            case FILENAME_CHANGE:
-                log.info("FILENAME_CHANGE case");
-//				System.out.println("FileName change");
-                //TODO change the permissions in all corresponding elastic documents
-//				ElasticService.processMetadataChange(fileId , fileMetadata,index);
+                //				ElasticService.processContentChange(fileId,slots,fileMetadata,index);
                 break;
             case PERMISSION_CHANGE:
-                log.info("PERMISSION_CHANGE case");
                 break;
             case METADATA_CHANGE:
-                log.info("METADATA_CHANGE case");
                 break;
         }
     }
@@ -98,16 +132,15 @@ public class Main {
     @Bean
     public Jackson2JsonMessageConverter messageConverter() {
         ObjectMapper mapper=new ObjectMapper();
-//		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,true);
+        //		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,true);
         return new Jackson2JsonMessageConverter(mapper);
     }
 
-    // You can comment the two methods below to use the default serialization / deserialization (instead of JSON)
     @Bean
     public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory){
         RabbitTemplate rabbitTemplate=new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(messageConverter());
-        return  rabbitTemplate;
+        return rabbitTemplate;
     }
 
     /**
