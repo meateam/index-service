@@ -19,15 +19,15 @@ public class EventService {
         }
     }
 
-//    public static void processMetadataChange(String fileId , String ownerId) throws IOException {
-//        try{
-////            FileMetadata meatadata = DriveService.getMetadata(fileId);
-//            ElasticService.indexMetadata(fileId,meatadata,ownerId);
-//        }
-//        catch(Exception exception){
-//            throw exception;
-//        }
-//    }
+    public static void processMetadataChange(String fileId , String ownerId) throws IOException {
+        try{
+            FileMetadata meatadata = FileMetadata.getMetadata(fileId);
+            ElasticService.indexMetadata(fileId,meatadata,ownerId);
+        }
+        catch(Exception exception){
+            throw exception;
+        }
+    }
 
     public static void processContentChange(String fileId,String ownerId) throws Exception {
         try{
@@ -49,25 +49,25 @@ public class EventService {
             Permission[] permissions;
             String [][] preSuffArrays;
 
-            //metadata = DriveService.getMetadata(fileId);
-            //ownerId = metadata.getOwner().getUserId();
+            metadata = FileMetadata.getMetadata(fileId);
+            ownerId = metadata.getOwner().getUserId();
 
-            //permissions = DriveService.getPermissions(fileId);
+            permissions = Permission.getPermissionsArray(fileId);
 
-            //DriveService.download(fileId, localFilePath);
+            DriveService.download(fileId, localFilePath);
             content = ParsingService.getContent(localFilePath);
             content = ParsingService.cleanContent(content);
             chunks = ChunkService.getChunks(content);
             preSuffArrays = ChunkService.getPreSuffArrays(content);
-//            for (String chunkContent : chunks) {
-//                Document document = new ChunkDocument(fileId, metadata, permissions, chunkContent);
-//                ElasticService.indexDocument(document, ownerId);
-//            }
-//
-//            for (String[] prefSuffParts : preSuffArrays){
-//                Document document = new PrefSuffDocument(fileId, metadata, permissions, prefSuffParts);
-//                ElasticService.indexDocument(document, ownerId);
-//            }
+            for (String chunkContent : chunks) {
+                Document document = new ChunkDocument(fileId, metadata, permissions, chunkContent);
+                ElasticService.indexDocument(document, ownerId);
+            }
+
+            for (String[] prefSuffParts : preSuffArrays){
+                Document document = new PrefSuffDocument(fileId, metadata, permissions, prefSuffParts);
+                ElasticService.indexDocument(document, ownerId);
+            }
             FileService.deleteFile(localFilePath);
         }
         catch(Exception exception){
@@ -78,11 +78,12 @@ public class EventService {
 
     public static void processPermissionChange(String fileId,String ownerId) throws IOException {
         try{
-            Permission[] permissions = DriveService.getPermissions(fileId);
+            Permission[] permissions = Permission.getPermissions(fileId);
             ElasticService.indexPermissions(fileId,permissions,ownerId);
         }
         catch(Exception exception){
             throw exception;
         }
     }
+
 }

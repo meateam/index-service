@@ -38,22 +38,22 @@ public class Main {
                     System.out.print("create");
                     EventService.processCreate(fileId,ownerId);
                     break;
-//                case PERMISSION_CHANGE:
-//                    System.out.print("PERMISSION_CHANGE");
-//                    EventService.processPermissionChange(fileId,ownerId);
-//                    break;
-//                case CONTENT_CHANGE:
-//                    System.out.print("CONTENT_CHANGE");
-//                    EventService.processContentChange(fileId,ownerId);
-//                    break;
-//                case METADATA_CHANGE:
-//                    System.out.print("METADATA_CHANGE");
-//                    EventService.processMetadataChange(fileId,ownerId);
-//                    break;
-//                case DELETE:
-//                    System.out.print("DELETE");
-//                    EventService.processDelete(fileId,ownerId);
-//                    break;
+                case PERMISSION_CHANGE:
+                    System.out.print("FILE_PERMISSION_CHANGE");
+                    EventService.processPermissionChange(fileId,ownerId);
+                    break;
+                case CONTENT_CHANGE:
+                    System.out.print("CONTENT_CHANGE");
+                    EventService.processContentChange(fileId,ownerId);
+                    break;
+                case METADATA_CHANGE:
+                    System.out.print("METADATA_CHANGE");
+                    EventService.processMetadataChange(fileId,ownerId);
+                    break;
+                case DELETE:
+                    System.out.print("DELETE");
+                    EventService.processDelete(fileId,ownerId);
+                    break;
             }
         }
         catch(Exception exception){
@@ -65,8 +65,8 @@ public class Main {
         try{
 
 //            DriveService.getAncestors("5fba241eac105400135301ad");
-            FileMetadata metadata = FileMetadata.getMetadata("5fba241eac105400135301ad");
-            System.out.println("hi");
+//            DriveService.getPermissions("5fba241eac105400135301ad");
+            Permission.getPermissionsArray("5fba241eac105400135301ad");
 //            DriveService.getMetadata("5fb3cda3a865ab0012099d32");
            // Document.indexRandomDocuments(3,3);
 

@@ -4,13 +4,13 @@ import DriveStubs.grpc.PermissionOuterClass;
 import Models.User;
 
 
-public class Role1 {
+public class ConvertRole {
 
-    public Role get(DriveStubs.grpc.PermissionOuterClass.Role role) {
-        if (role.equals("READ"))
+    public static Role get(DriveStubs.grpc.PermissionOuterClass.Role role) {
+        if (role.equals(PermissionOuterClass.Role.READ))
             return Role.READ;
-        if (role.equals("WRITE"))
+        if (role.equals(PermissionOuterClass.Role.WRITE))
             return Role.WRITE;
-        return Role.
+        return Role.NONE;
     }
 }

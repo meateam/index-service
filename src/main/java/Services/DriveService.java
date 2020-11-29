@@ -1,16 +1,15 @@
 package Services;
 
 import Config.Config;
-import DriveStubs.grpc.FileOuterClass;
-import DriveStubs.grpc.FileServiceGrpc;
-import DriveStubs.grpc.UsersGrpc;
-import DriveStubs.grpc.UsersOuterClass;
+import DriveStubs.grpc.*;
 import Models.FileMetadata;
 import Models.Permission;
 import Models.User;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
+
+import java.util.Iterator;
 
 public class DriveService {
 
@@ -24,9 +23,33 @@ public class DriveService {
     }
     public static void download(String fileId, String path){
         // TODO download the file and save it in path
+
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(Config.DRIVE_URL, Config.DOWNLOAD_SERVICE_PORT).usePlaintext().build();
+        DownloadGrpc.DownloadBlockingStub downloadStub = DownloadGrpc.newBlockingStub(channel);
+        DownloadService.DownloadRequest downloadRequest = DownloadService.DownloadRequest.newBuilder()
+                .setBucket(getFileById(fileId).getBucket()).setKey(getFileById(fileId).getKey()).build();
+        Iterator<DownloadService.DownloadResponse> response = downloadStub.download(downloadRequest);
+        while(response.hasNext()){
+            response.next();
+        }
+
+
+
+        //        Object obj = downloadStub.download(downloadRequest);
+//        downloadStub.download(downloadRequest).
+//        by
+//        for (DownloadService.DownloadResponse b: bytes){
+//            System.out.println(b);
+//        }
+
     }
-    public static Permission[] getPermissions(String fileId){
-        return null;
+    public static PermissionOuterClass.GetFilePermissionsResponse getPermissions(String fileId){
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(Config.DRIVE_URL, Config.PERMISSION_SERVICE_PORT).usePlaintext().build();
+        PermissionGrpc.PermissionBlockingStub permissionStub = PermissionGrpc.newBlockingStub(channel);
+        PermissionOuterClass.GetFilePermissionsRequest filePermissionsRequest = PermissionOuterClass.GetFilePermissionsRequest.newBuilder()
+                .setFileID(fileId).build();
+        PermissionOuterClass.GetFilePermissionsResponse permissions = permissionStub.getFilePermissions(filePermissionsRequest);
+        return permissions;
     }
 
     public static UsersOuterClass.User getUser (String userId) {

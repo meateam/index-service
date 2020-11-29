@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option java_package = "DriveStubs.grpc";
+
 package download;
 
 // Interface exported by the server

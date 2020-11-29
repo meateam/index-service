@@ -1,16 +1,21 @@
 package Models;
 
+import DriveStubs.grpc.PermissionOuterClass;
+import Enums.ConvertRole;
 import Enums.Role;
+import Services.DriveService;
 import com.github.javafaker.Faker;
+import com.google.protobuf.ProtocolStringList;
+import org.apache.poi.ss.formula.functions.Index;
 
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 public class Permission {
     private User user;
     private Role role;
 
     public Permission(User user, Role role){
+        System.out.println(user.getName() + " " +user.getName());
         this.user = user;
         this.role = role;
     }
@@ -55,7 +60,41 @@ public class Permission {
         return permissions;
     }
 
-    public String toString (){
-        return this.role + this.user.getName() + this.user.getUserId();
+//    public String toString (){
+//        return this.role + " " this.user.getName() + this.user.getUserId();
+//    }
+
+    public static Permission [] getPermissions (String fileId) {
+
+        List<PermissionOuterClass.GetFilePermissionsResponse.UserRole> permissions = DriveService.getPermissions(fileId).getPermissionsList();
+        ArrayList<Permission> permissionList = new ArrayList<Permission>();
+        for (PermissionOuterClass.GetFilePermissionsResponse.UserRole permission : permissions){
+            Permission p = new Permission(User.getUser(permission.getUserID()), ConvertRole.get(permission.getRole()));
+            permissionList.add(p);
+        }
+        ProtocolStringList ancestors = DriveService.getAncestors(fileId).getAncestorsList();
+        for (String ancestor : ancestors){
+            permissions = DriveService.getPermissions(ancestor).getPermissionsList();
+            for (PermissionOuterClass.GetFilePermissionsResponse.UserRole permission : permissions){
+                Permission p = new Permission(User.getUser(permission.getUserID()),ConvertRole.get(permission.getRole()));
+                Optional<Permission> optionalPermission = permissionList.stream().filter((Permission item) ->
+                        item.getUser().getUserId().equals(p.getUser().getUserId())).findFirst();
+
+                if(optionalPermission.isPresent()){
+                    Permission existingPermission = optionalPermission.get();
+                    if(existingPermission.role == Role.READ && p.role == Role.WRITE){
+                        existingPermission.setRole(Role.WRITE);
+                    }
+                } else {
+                    permissionList.add(p);
+                }
+            }
+        }
+        System.out.println(permissionList);
+        //get file ancesstors
+        // get ancesstors Permission
+        // hash map permissons uniqe
+        return null;
     }
+
 }
